@@ -158,9 +158,8 @@ jobs:
         SSH_COMMAND="ssh -i ec2.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST"
         SCP_COMMAND="scp -i ec2.pem -o StrictHostKeyChecking=no"
 
-        # Ensure Docker + AWS CLI are installed
-        sudo apt-get update -y &&
-        sudo apt-get install -y docker.io awscli &&
+        # Ensure Docker + AWS CLI installed on EC2
+        $SSH_COMMAND "sudo apt-get update -y && sudo apt-get install -y docker.io awscli"
 
         #Login to Docker registry
         $SSH_COMMAND "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REGISTRY"
