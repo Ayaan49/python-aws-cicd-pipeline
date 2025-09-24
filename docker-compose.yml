@@ -2,7 +2,7 @@ version: '2.4'  # The last version of Docker Compose file format that directly s
 services:
   counter-service:
     container_name: py-aws-cicd
-    image: <aws account id>.dkr.ecr.us-east-1.amazonaws.com/py-aws-cicd:latest
+    image: "${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
     volumes:
       - ./data:/data
     ports:
