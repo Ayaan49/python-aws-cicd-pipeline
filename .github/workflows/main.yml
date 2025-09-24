@@ -162,7 +162,7 @@ jobs:
         $SSH_COMMAND "sudo apt-get update -y && sudo apt-get install -y docker.io awscli"
 
         #Login to Docker registry
-        $SSH_COMMAND "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REGISTRY"
+        $SSH_COMMAND "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin $ECR_REGISTRY"
         
         # Copy docker-compose.yml to EC2 server
         $SCP_COMMAND docker-compose.yml $EC2_USER@$EC2_HOST:/home/ubuntu/docker/
