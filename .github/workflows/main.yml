@@ -166,16 +166,14 @@ jobs:
         
         # Copy docker-compose.yml to EC2 server
         $SCP_COMMAND docker-compose.yml $EC2_USER@$EC2_HOST:/home/$EC2_USER/docker/
-
-        # (Optional) pull explicitly; not required if using --pull always below
-        $SSH_COMMAND "sudo docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG || true"
         
         # Run compose with env vars injected into the remote shell
         $SSH_COMMAND "cd /home/$EC2_USER/docker && \
-          ECR_REGISTRY='$ECR_REGISTRY' \
-          ECR_REPOSITORY='$ECR_REPOSITORY' \
-          IMAGE_TAG='$IMAGE_TAG' \
-          sudo docker compose up -d --pull always --force-recreate"
+          sudo --preserve-env=ECR_REGISTRY,ECR_REPOSITORY,IMAGE_TAG \
+          env ECR_REGISTRY='$ECR_REGISTRY' \
+              ECR_REPOSITORY='$ECR_REPOSITORY' \
+              IMAGE_TAG='$IMAGE_TAG' \
+          docker compose up -d --pull always --force-recreate"
         
         # Cleanup PEM key
         rm -f ec2.pem
