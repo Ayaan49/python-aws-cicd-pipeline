@@ -162,13 +162,20 @@ jobs:
         $SSH_COMMAND "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin $ECR_REGISTRY"
 
         # Create app dir if missing
-        $SSH_COMMAND "mkdir -p /home/$EC2_USER/docker/"
+        $SSH_COMMAND "mkdir -p /home/$EC2_USER/docker/data"
         
         # Copy docker-compose.yml to EC2 server
         $SCP_COMMAND docker-compose.yml $EC2_USER@$EC2_HOST:/home/$EC2_USER/docker/
+
+        # (Optional) pull explicitly; not required if using --pull always below
+        $SSH_COMMAND "sudo docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG || true"
         
-        # Pull and run the Docker container on EC2
-        $SSH_COMMAND "cd /home/$EC2_USER/docker/ && sudo docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG && sudo docker compose -f docker-compose.yml up -d --force-recreate"
+        # Run compose with env vars injected into the remote shell
+        $SSH_COMMAND "cd /home/$EC2_USER/docker && \
+          ECR_REGISTRY='$ECR_REGISTRY' \
+          ECR_REPOSITORY='$ECR_REPOSITORY' \
+          IMAGE_TAG='$IMAGE_TAG' \
+          sudo docker compose up -d --pull always --force-recreate"
         
         # Cleanup PEM key
         rm -f ec2.pem
