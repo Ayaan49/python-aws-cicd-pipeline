@@ -172,7 +172,7 @@ jobs:
         
         # Pull and run the Docker container on EC2
         $SSH_COMMAND "sudo docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-        $SSH "sudo docker run -d $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        $SSH "sudo docker run -d -p 8080:8080 $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
         
         # Cleanup PEM key
         rm -f ec2.pem
