@@ -159,7 +159,7 @@ jobs:
         SCP_COMMAND="scp -i ec2.pem -o StrictHostKeyChecking=no"
 
         # Ensure Docker + AWS CLI installed on EC2
-        $SSH_COMMAND "sudo apt-get update -y && sudo apt-get install -y docker.io docker-compose-plugin awscli"
+        $SSH_COMMAND "sudo apt-get update -y && sudo apt-get install -y docker.io awscli"
 
         #Login to Docker registry
         $SSH_COMMAND "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin $ECR_REGISTRY"
@@ -172,7 +172,7 @@ jobs:
         
         # Pull and run the Docker container on EC2
         $SSH_COMMAND "sudo docker pull $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-        $SSH_COMMAND "cd /home/ubuntu/docker/ && sudo docker compose -f docker-compose.yml up -d --force-recreate"
+        $SSH "cd ~/docker && sudo docker run -d $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
         
         # Cleanup PEM key
         rm -f ec2.pem
